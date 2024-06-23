@@ -3,6 +3,7 @@ import { memory } from "./memory";
 import { simpleString } from "./RESP/simpleString";
 import { bulkString, nullBulkString } from "./RESP/bulkString";
 import { addMilliseconds, isAfter } from "date-fns";
+import { config } from "./config";
 
 /**
  * Supported redis commands
@@ -54,7 +55,7 @@ const getHandler: RedisCommandHandler = (connection, data) => {
 };
 
 const infoHandler: RedisCommandHandler = (connection, data) => {
-  connection.write(bulkString("role:master"));
+  connection.write(bulkString(`role:${config.role}`));
 };
 
 /**
