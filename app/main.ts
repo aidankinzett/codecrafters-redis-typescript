@@ -6,9 +6,9 @@ console.log("Logs from your program will appear here!");
 // Uncomment this block to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
-  connection.on("data", () => {
+  connection.on("data", (data) => {
     // respond with pong
-    connection.write("+PONG\r\n");
+    connection.write(data);
   });
 });
 
