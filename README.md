@@ -1,4 +1,4 @@
-[![progress-banner](https://backend.codecrafters.io/progress/redis/3ce8718e-5a3a-4bae-b041-29b5e84eb0e2)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+[![progress-banner](https://backend.codecrafters.io/progress/redis/3ce8718e-5a3a-4bae-b041-29b5e84eb0e2)](https://app.codecrafters.io/users/aidan-kinzett?r=2qF)
 
 This is a starting point for TypeScript solutions to the
 ["Build Your Own Redis" Challenge](https://codecrafters.io/challenges/redis).
