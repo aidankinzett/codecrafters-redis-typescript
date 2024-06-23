@@ -29,4 +29,8 @@ export const redisProtocolParser = (input: string) => {
 
     return output;
   }
+
+  if (lines[0].startsWith("+")) {
+    return [lines[0].slice("+".length)];
+  }
 };

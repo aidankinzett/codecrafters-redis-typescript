@@ -4,7 +4,6 @@ import { commandHandlers } from "./commandHandlers";
 import minimist from "minimist";
 import { config } from "./config";
 import { RedisCommand } from "./commandHandlers/types";
-import { simpleString } from "./RESP/simpleString";
 import { array } from "./RESP/array";
 
 const server: net.Server = net.createServer((connection: net.Socket) => {
@@ -47,8 +46,21 @@ if (config.role === "slave" && config.masterUrl && config.masterPort) {
     },
   );
   client.on("data", (data) => {
-    console.log("Received from the master server:", data.toString());
-    client.end();
+    const parsedData = redisProtocolParser(data.toString());
+
+    console.log("Received from the master server:", parsedData);
+
+    if (!parsedData) throw Error("Data parsing failed");
+
+    if (parsedData[0] === "PONG") {
+      client.write(
+        array(["REPLCONF", "listening-port", config.port.toString()]),
+      );
+    }
+
+    if (parsedData[0] === "OK") {
+      client.write(array(["REPLCONF", "capa", "psync2"]));
+    }
   });
   client.on("end", () => {
     console.log("Disconnected from the master server");
