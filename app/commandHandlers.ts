@@ -1,7 +1,8 @@
 import * as net from "net";
 import { memory } from "./memory";
 import { simpleString } from "./RESP/simpleString";
-import { bulkString } from "./RESP/bulkString";
+import { bulkString, nullBulkString } from "./RESP/bulkString";
+import { addMilliseconds, isAfter } from "date-fns";
 
 /**
  * Supported redis commands
@@ -21,9 +22,18 @@ const pingHandler: RedisCommandHandler = (connection) => {
 const setHandler: RedisCommandHandler = (connection, data) => {
   const key = data[1];
   const value = data[2];
+  let expiry: Date | undefined = undefined;
+
+  // check for command argument
+  const commandArgument = data[3];
+
+  if (commandArgument?.toLowerCase() === "px") {
+    expiry = addMilliseconds(new Date(), parseInt(data[4]));
+    console.log(expiry);
+  }
 
   // set value in memory
-  memory[key] = value;
+  memory[key] = { value, expiry };
 
   connection.write(simpleString("OK"));
 };
@@ -32,7 +42,13 @@ const getHandler: RedisCommandHandler = (connection, data) => {
   const key = data[1];
 
   // get value from memory
-  const value = memory[key];
+  const { value, expiry } = memory[key];
+
+  // if the current date is after the expiry
+  if (expiry && isAfter(new Date(), expiry)) {
+    connection.write(nullBulkString);
+    return;
+  }
 
   connection.write(bulkString(value));
 };

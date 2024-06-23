@@ -1,1 +1,7 @@
-export const memory: Record<string, string> = {};
+export const memory: Record<
+  string,
+  {
+    value: string;
+    expiry?: Date;
+  }
+> = {};
