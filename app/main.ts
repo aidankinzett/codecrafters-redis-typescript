@@ -64,9 +64,12 @@ if (config.role === "slave" && config.masterUrl && config.masterPort) {
 
     console.log("Received from the master server:", parsedData);
 
-    handshake[handshakeIndex](client);
+    const handshakeFn = handshake[handshakeIndex];
 
-    handshakeIndex += 1;
+    if (handshakeFn) {
+      handshakeFn(client);
+      handshakeIndex += 1;
+    }
   });
   client.on("end", () => {
     console.log("Disconnected from the master server");
