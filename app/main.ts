@@ -37,6 +37,20 @@ if (args.replicaof) {
 
 server.listen(config.port, "127.0.0.1");
 
+let handshakeIndex = 0;
+
+const handshake: ((client: net.Socket) => void)[] = [
+  (client) => {
+    client.write(array(["REPLCONF", "listening-port", config.port.toString()]));
+  },
+  (client) => {
+    client.write(array(["REPLCONF", "capa", "psync2"]));
+  },
+  (client) => {
+    client.write(array(["PSYNC", "?", "-1"]));
+  },
+];
+
 if (config.role === "slave" && config.masterUrl && config.masterPort) {
   const client = net.createConnection(
     { host: config.masterUrl, port: config.masterPort },
@@ -50,17 +64,9 @@ if (config.role === "slave" && config.masterUrl && config.masterPort) {
 
     console.log("Received from the master server:", parsedData);
 
-    if (!parsedData) throw Error("Data parsing failed");
+    handshake[handshakeIndex](client);
 
-    if (parsedData[0] === "PONG") {
-      client.write(
-        array(["REPLCONF", "listening-port", config.port.toString()]),
-      );
-    }
-
-    if (parsedData[0] === "OK") {
-      client.write(array(["REPLCONF", "capa", "psync2"]));
-    }
+    handshakeIndex += 1;
   });
   client.on("end", () => {
     console.log("Disconnected from the master server");
