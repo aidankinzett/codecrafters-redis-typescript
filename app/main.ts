@@ -1,6 +1,7 @@
 import * as net from "net";
 import { redisProtocolParser } from "./redisProtocolParser";
 import { commandHandlers, RedisCommand } from "./commandHandlers";
+import { argv } from "node:process";
 
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
@@ -17,4 +18,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   });
 });
 
-server.listen(6379, "127.0.0.1");
+const PORT = argv[2] === "--port" ? Number(argv[3]) : 6379;
+
+server.listen(PORT, "127.0.0.1");
