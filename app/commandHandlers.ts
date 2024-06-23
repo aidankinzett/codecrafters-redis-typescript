@@ -11,7 +11,7 @@ export type RedisCommand = "PING" | "ECHO" | "SET" | "GET";
 type RedisCommandHandler = (connection: net.Socket, data: string[]) => void;
 
 const echoHandler: RedisCommandHandler = (connection, data) => {
-  connection.write(`+${data[1]}\r\n`);
+  connection.write(simpleString(data[1]));
 };
 
 const pingHandler: RedisCommandHandler = (connection) => {
