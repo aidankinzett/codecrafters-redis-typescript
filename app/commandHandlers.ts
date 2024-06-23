@@ -7,7 +7,7 @@ import { addMilliseconds, isAfter } from "date-fns";
 /**
  * Supported redis commands
  */
-export type RedisCommand = "PING" | "ECHO" | "SET" | "GET";
+export type RedisCommand = "PING" | "ECHO" | "SET" | "GET" | "INFO";
 
 type RedisCommandHandler = (connection: net.Socket, data: string[]) => void;
 
@@ -53,6 +53,10 @@ const getHandler: RedisCommandHandler = (connection, data) => {
   connection.write(bulkString(value));
 };
 
+const infoHandler: RedisCommandHandler = (connection, data) => {
+  connection.write(bulkString("role:master"));
+};
+
 /**
  * Maps redis commands to their handlers
  */
@@ -61,4 +65,5 @@ export const commandHandlers: Record<RedisCommand, RedisCommandHandler> = {
   PING: pingHandler,
   SET: setHandler,
   GET: getHandler,
+  INFO: infoHandler,
 };
